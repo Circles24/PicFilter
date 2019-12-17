@@ -46,6 +46,13 @@ public class Server implements Runnable
 
                 }
 
+                else {
+
+                    new DataOutputStream(skt.getOutputStream()).writeUTF("Sorry Server is busy");
+                
+                    skt.close();
+                }
+
             }
 
         }
