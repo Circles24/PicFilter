@@ -1,86 +1,35 @@
-import java.io.*;
-import java.net.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import javax.imageio.ImageIO;
 
-class ClientHandler extends Thread
+class ResourceManager
 {
 
-    int index;
-    ResourceManager resManager;
+    private final static ResourceManager selfRef;
 
-    DataInputStream din;
-    DataOutputStream dout;
+    ClientHandlerPool CHPool;
 
-    File img;
-    byte[] buff;
-    BufferedImage buffImg;
+    ImageProcessorPool IPPool;
 
-    FileOutputStream fout;
-
-    public ClientHandler(int index,ResourceManager resManager){
-
-        System.out.println("@ ClientHandler.ClientHandler :: "+index);
-
-        this.index = index;
-        this.resManager = resManager;
-        
-    }
-
-    public void init(Socket skt)throws Exception
+    private ResourceManager()
     {
+        CHPool = new ClientHandlerPool();
 
-        System.out.println("@ ClientHandler.init :: "+index);
-
-        din = new DataInputStream(skt.getInputStream());
-        dout = new DataOutputStream(skt.getOutputStream());
-
+        IPPool = new ImageProcessorPool();
     }
 
-    public void run(){
+    public static synchronized ResourceManager getInstance()
+    {
+        if(selfRef == null)selfRef = new  ResourceManager();
 
-        System.out.println("@ CLientHandler.run :: "+index);
-
-        int n;
-
-        while(true){
-
-            try{
-  
-                int imgSize = din.readInt();
-
-                fout = new FileOutputStream("assets/"+index+"/img.png");
-
-                while(true){
-
-                    n = din.read(buff);
-                    
-                    if(n == -1)break;
-
-                    fout.write(buff,0,n);
-
-                }
-
-                fout.close();
-
-                img = new file("assets/"+index+"/img.png");
-
-                buffImage = ImageIO.read(img);
-
-                resManager.process(this);
-
-            }
-
-            catch(Exception ex){
-
-                System.out.println("Exception@ClientHandler.run "+index+" :: "+ex.getMessage());
-                
-                ex.printStackTrace();
-            }
-
-        }
-
+        return selfRef;
     }
-    
+
+    public boolean isClientHandlerAvailable()
+    {
+        return CHPool.isClientHandlerAvailable();
+    }
+
+    public synchronized void process(ClientHandler CHandler){
+
+        IPPool.process(CHandler);
+    }
+
 }

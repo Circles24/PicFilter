@@ -70,6 +70,8 @@ class ClientHandler extends Thread
 
                 resManager.process(this);
 
+                
+
             }
 
             catch(Exception ex){
