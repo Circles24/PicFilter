@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import javax.imageio.ImageIO;
 
-class ClientHandler extends Thread
+class ClientHandler
 {
 
     int index;
@@ -18,6 +18,26 @@ class ClientHandler extends Thread
     BufferedImage buffImg;
 
     FileOutputStream fout;
+
+    class ClientHandlerThreadder extends Thread
+    {
+
+        ClientHandler CHandler;
+
+        public ClientHandlerThreadder(ClientHandler CHandler){
+
+            this.CHandler = CHandler;
+            this.start();
+
+        }
+
+        public void run(){
+            
+            CHandler.run();
+            
+        }
+
+    }
 
     public ClientHandler(int index,ResourceManager resManager){
 
@@ -35,6 +55,8 @@ class ClientHandler extends Thread
 
         din = new DataInputStream(skt.getInputStream());
         dout = new DataOutputStream(skt.getOutputStream());
+
+        
 
     }
 
