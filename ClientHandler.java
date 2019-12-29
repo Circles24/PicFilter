@@ -1,50 +1,54 @@
 import java.io.*;
 import java.net.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import javax.imageio.ImageIO;
 
 class ClientHandler
 {
 
     int index;
+    ClientHandlerPoolManager poolManager;
     ResourceManager resManager;
 
+    ClientHandlerThreadder threadder;
+
+    Socket skt;
     DataInputStream din;
     DataOutputStream dout;
 
     File img;
     byte[] buff;
-    BufferedImage buffImg;
 
     FileOutputStream fout;
+    FileInputStream fin;
 
     class ClientHandlerThreadder extends Thread
     {
 
-        ClientHandler CHandler;
+        ClientHandler ClHandler;
 
-        public ClientHandlerThreadder(ClientHandler CHandler){
+        public ClientHandlerThreadder(ClientHandler ClHandler){
 
-            this.CHandler = CHandler;
+            this.ClHandler = ClHandler;
             this.start();
 
         }
 
         public void run(){
             
-            CHandler.run();
+            ClHandler.run();
             
         }
 
     }
 
-    public ClientHandler(int index,ResourceManager resManager){
+    public ClientHandler(ClientHandlerPoolManager poolManager,ResourceManager resManager,int index){
 
         System.out.println("@ ClientHandler.ClientHandler :: "+index);
 
-        this.index = index;
+        this.poolManager = poolManager;
         this.resManager = resManager;
+        this.index = index;
+
+        this.threadder = new ClientHandlerThreadder(this);
         
     }
 
@@ -53,46 +57,74 @@ class ClientHandler
 
         System.out.println("@ ClientHandler.init :: "+index);
 
+        this.skt = skt;
+
         din = new DataInputStream(skt.getInputStream());
         dout = new DataOutputStream(skt.getOutputStream());
 
-        
+        threadder.interrupt();
 
     }
 
     public void run(){
 
-        System.out.println("@ CLientHandler.run :: "+index);
+        System.out.println("@ ClientHandler.run :: "+index);
 
         int n;
 
         while(true){
 
             try{
+
+                if(din == null)Thread.sleep(1000);
+
+                else{
   
-                int imgSize = din.readInt();
+                    int imgSize = din.readInt();
 
-                fout = new FileOutputStream("assets/"+index+"/img.png");
+                    fout = new FileOutputStream("assets/"+index+"/img.png");
 
-                while(true){
+                    while(imgSize != 0){
 
-                    n = din.read(buff);
+                        n = din.read(buff);
+
+                        imgSize -= n;
+
+                        fout.write(buff,0,n);
+
+                    }
+
+                    fout.close();
+
+                    img = new File("assets/"+index+"/img.png");
+
+                    resManager.process(this);
+
+                    try{
+
+                        Thread.sleep(100000);
                     
-                    if(n == -1)break;
+                    }
 
-                    fout.write(buff,0,n);
+                    catch(Exception ex){
+
+                        System.out.println("Exception@CLientHanlder.run "+index+" :: "+ex.getMessage());
+                    }
+
+                    fin = new FileInputStream(img);
+
+                    while((n = fin.read(buff)) != -1){
+
+                        dout.write(buff,0,n);
+                    }      
+                    
+                    fin.close();
+                    din.close();
+                    dout.close();
+
+                    poolManager.free(index);
 
                 }
-
-                fout.close();
-
-                img = new file("assets/"+index+"/img.png");
-
-                buffImage = ImageIO.read(img);
-
-                resManager.process(this);
-
-                
 
             }
 
@@ -105,6 +137,11 @@ class ClientHandler
 
         }
 
+    }
+
+    public void interrupt(){
+
+        threadder.interrupt();
     }
     
 }

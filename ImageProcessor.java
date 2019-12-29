@@ -2,46 +2,85 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
-class ImageProcessor extends Thread
+class ImageProcessor 
 {
-    ClientHandler CHandler;
+    int index;
+    ImageProcessorPoolManager poolManager;
+    ClientHandler ClHandler;
 
-    public ImageProcessor(){
+    ImageProcessorThreadder threadder;
 
-        CHandler = null;
+    class ImageProcessorThreadder extends Thread
+    {
 
-        this.start();
+        ImageProcessor imgProcessor;        
+
+        public ImageProcessorThreadder(ImageProcessor imgProcessor){
+
+            this.imgProcessor = imgProcessor;
+
+            this.start();
+        }
+        public void run(){
+
+            imgProcessor.run();
+        }
+    }
+
+    public ImageProcessor(ImageProcessorPoolManager poolManager,int index){
+
+        System.out.println("@ImageProcessor.ImageProcessor :: "+index);
+
+        ClHandler = null;
+
+        this.poolManager = poolManager;
+        this.index = index;
+
+        threadder = new ImageProcessorThreadder(this);
 
     }
 
     private void process(){
 
+        System.out.println("@ImageProcessor.process :: "+index);
 
     }
 
+    public void init(ClientHandler ClHandler){
+
+        System.out.println("@ImageProcessor.init :: "+index);
+
+        this.ClHandler = ClHandler;
+
+        threadder.interrupt();
+    }
+
     public void run(){
+
+        System.out.println("@ImageProcessor.run :: "+index);
 
         while(true){
 
             try{
 
-                if(CHandler == null)This.Sleep(1000);
+                if(ClHandler == null)Thread.sleep(1000);
 
                 else {
 
                     process();
 
-                    CHandler.interrupt();
+                    ClHandler.interrupt();
 
-                    resManager.free(this);
+                    poolManager.free(index);
 
-                    CHandler = null;
+                    ClHandler = null;
                 }
 
             }
 
             catch(Exception ex){
 
+                System.out.println("Exception@ImageProcessor.run :: "+ex.getMessage());
 
             }
         }
