@@ -71,18 +71,25 @@ class ClientHandler
         System.out.println("@ ClientHandler.run :: "+index);
 
         int n;
+        int imgSize;
+
+        int k = 0;
 
         while(true){
 
             try{
 
-                if(din == null)Thread.sleep(1000);
+                System.out.println("iterating here "+(k++));
+
+                if(skt == null || skt.isConnected() == false)Thread.sleep(100000);
 
                 else{
   
-                    int imgSize = din.readInt();
+                    imgSize = din.readInt();
 
-                    fout = new FileOutputStream("assets/"+index+"/img.png");
+                    System.out.println("File Size :: "+imgSize);
+
+                    fout = new FileOutputStream("assets/tempDump/"+index+"/img.png");
 
                     while(imgSize != 0){
 
@@ -96,13 +103,13 @@ class ClientHandler
 
                     fout.close();
 
-                    img = new File("assets/"+index+"/img.png");
+                    img = new File("assets/tempDump/"+index+"/img.png");
 
                     resManager.process(this);
 
                     try{
 
-                        Thread.sleep(100000);
+                        Thread.sleep(1000000);
                     
                     }
 
@@ -118,9 +125,12 @@ class ClientHandler
                         dout.write(buff,0,n);
                     }      
                     
+                    skt.close();
                     fin.close();
                     din.close();
                     dout.close();
+
+                    skt = null;
 
                     poolManager.free(index);
 
@@ -129,6 +139,26 @@ class ClientHandler
             }
 
             catch(Exception ex){
+
+                try{
+
+                    skt.close();
+                    fin.close();
+                    din.close();
+                    dout.close();
+
+                    skt = null;
+
+                }
+
+                catch(Exception e){
+
+                    System.out.println("Exception@ClientHandler :: "+e.getMessage());
+
+                    e.printStackTrace();
+                }
+
+                poolManager.free(index);
 
                 System.out.println("Exception@ClientHandler.run "+index+" :: "+ex.getMessage());
                 

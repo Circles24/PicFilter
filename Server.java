@@ -81,7 +81,7 @@ public class Server implements Runnable
 
         try{
 
-            if(args.length != 3)throw new Exception("Usage :: java Server <portNo>");
+            if(args.length != 3)throw new Exception("Usage :: java Server <portNo> <client_handler_count> <image_processor_count> ");
 
             int portNo = Integer.parseInt(args[0]);
             int CLIENT_HANDLER_COUNT = Integer.parseInt(args[1]);
