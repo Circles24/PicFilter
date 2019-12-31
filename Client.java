@@ -55,12 +55,17 @@ public class Client{
         
         buff = new byte[BUFF_SIZE];
 
+        threadder = new ClientThreadder(this); 
+    }
+
+    public void init()throws Exception
+    {
+
         skt = new Socket(serverIP,serverPortNo);
 
         din = new DataInputStream(skt.getInputStream());
         dout = new DataOutputStream(skt.getOutputStream());
 
-        threadder = new ClientThreadder(this); 
     }
 
     public void run(){
@@ -81,6 +86,21 @@ public class Client{
                 System.out.println("Enter 0/1 for exit/continue");
 
                 if(scn.nextInt() == 0)break;
+            
+                try{
+
+                    init();
+                }
+
+                catch(Exception ex){
+
+                    System.out.println("Exception@Client.run :: "+ex.getMessage());
+                    ex.printStackTrace();
+
+                    System.out.println("Server not available closing the shell");
+
+                    return ;
+                }
                 
                 System.out.println("enter the file address");
 
@@ -94,35 +114,35 @@ public class Client{
 
                 dout.writeInt(imgFileSize);
 
-                while( (n = fin.read(buff)) > 0){
+                // while( (n = fin.read(buff)) > 0){
 
-                    dout.write(buff,0,n);
+                //     dout.write(buff,0,n);
 
-                }
+                // }
                 
                 fin.close();
 
-                System.out.println("Enter the result img name");
+                // System.out.println("Enter the result img name");
 
-                imgFileName = scn.next();
-                img = new File(imgFileName);
+                // imgFileName = scn.next();
+                // img = new File(imgFileName);
 
-                fout = new FileOutputStream(img);
+                // fout = new FileOutputStream(img);
 
-                System.out.println("Server is processing your request");
+                // System.out.println("Server is processing your request");
 
-                while(imgFileSize > 0){
+                // while(imgFileSize > 0){
 
-                    n = din.read(buff);
+                //     n = din.read(buff);
 
-                    imgFileSize -= n;
+                //     imgFileSize -= n;
 
-                    fout.write(buff,0,n);
+                //     fout.write(buff,0,n);
 
-                }
+                // }
 
-                System.out.println("your img has been saved as "+imgFileName);
-
+                // System.out.println("your img has been saved as "+imgFileName);
+                System.out.println("Done");
             }
 
             catch(Exception ex){

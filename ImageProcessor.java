@@ -67,13 +67,25 @@ class ImageProcessor
 
                 else {
 
-                    process();
+                    try{
 
-                    ClHandler.interrupt();
+                        process();
+                    
+                    }
 
-                    poolManager.free(index);
+                    catch(Exception ex){
 
-                    ClHandler = null;
+                        System.out.println("Exception@ImageProcessor.run :: "+ex.getMessage());
+                        ex.printStackTrace();
+                    }
+
+                    finally{
+
+                        ClHandler.interrupt();
+                        ClHandler = null;
+                        poolManager.free(index);
+
+                    }
                 }
 
             }

@@ -6,8 +6,8 @@ public class ClientHandlerPoolManager{
 
     ClientHandler[] ClientHandlerRef;
 
-    HashSet<ClientHandler> idleClientHandlers;
-    HashSet<ClientHandler> busyClientHandlers;
+    HashSet<Integer> idleClientHandlers;
+    HashSet<Integer> busyClientHandlers;
 
     public ClientHandlerPoolManager(ResourceManager resManager,int CLIENT_HANDLER_COUNT){
 
@@ -17,8 +17,8 @@ public class ClientHandlerPoolManager{
 
         ClientHandlerRef = new ClientHandler[CLIENT_HANDLER_COUNT];
 
-        idleClientHandlers = new HashSet<ClientHandler>();
-        busyClientHandlers = new HashSet<ClientHandler>();
+        idleClientHandlers = new HashSet<Integer>();
+        busyClientHandlers = new HashSet<Integer>();
 
         for(int i=0;i<CLIENT_HANDLER_COUNT;i++){
 
@@ -26,19 +26,17 @@ public class ClientHandlerPoolManager{
 
             ClientHandlerRef[i] = new ClientHandler(this,resManager,i);
 
-            idleClientHandlers.add(ClientHandlerRef[i]);
+            idleClientHandlers.add(i);
         }
     }
 
 
 	public void free(int index){
 
-        System.out.println("@ClientHandlerPoolManager.free");
+        System.out.println("@ClientHandlerPoolManager.free :: "+index);
 
-        ClientHandler currentRef = ClientHandlerRef[index];
-
-        if(busyClientHandlers.remove(currentRef))
-            idleClientHandlers.add(currentRef);
+        if(busyClientHandlers.remove(index))
+            idleClientHandlers.add(index);
         
     }
 
@@ -53,12 +51,12 @@ public class ClientHandlerPoolManager{
 
         if(idleClientHandlers.size() == 0)throw new Exception("No Client Handlers Available");
 
-        ClientHandler clHandler = idleClientHandlers.iterator().next();
+        int clHandlerIndex = idleClientHandlers.iterator().next();
 
-        idleClientHandlers.remove(clHandler);
-        busyClientHandlers.add(clHandler);
+        idleClientHandlers.remove(clHandlerIndex);
+        busyClientHandlers.add(clHandlerIndex);
 
-        return clHandler;
+        return ClientHandlerRef[clHandlerIndex];
 
     }
 }

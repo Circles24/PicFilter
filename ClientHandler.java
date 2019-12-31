@@ -79,86 +79,93 @@ class ClientHandler
 
             try{
 
-                System.out.println("iterating here "+(k++));
+                System.out.println("Client Handler "+index+" iteration "+(k++));
 
-                if(skt == null || skt.isConnected() == false)Thread.sleep(100000);
+                if(skt == null || skt.isConnected() == false ){
+
+                    System.out.println("Client Handler "+index+" going to sleep");
+
+                    Thread.sleep(100000);
+                }
 
                 else{
-  
-                    imgSize = din.readInt();
-
-                    System.out.println("File Size :: "+imgSize);
-
-                    fout = new FileOutputStream("assets/tempDump/"+index+"/img.png");
-
-                    while(imgSize != 0){
-
-                        n = din.read(buff);
-
-                        imgSize -= n;
-
-                        fout.write(buff,0,n);
-
-                    }
-
-                    fout.close();
-
-                    img = new File("assets/tempDump/"+index+"/img.png");
-
-                    resManager.process(this);
 
                     try{
+  
+                        System.out.println("Client Handler "+index+" waiting for client");
 
-                        Thread.sleep(1000000);
-                    
+                        imgSize = din.readInt();
+
+                        System.out.println("File Size :: "+imgSize);
+
+                        // fout = new FileOutputStream("assets/tempDump/"+index+"/img.png");
+
+                        // while(imgSize != 0){
+
+                        //     n = din.read(buff);
+
+                        //     imgSize -= n;
+
+                        //     fout.write(buff,0,n);
+
+                        // }
+
+                        // fout.close();
+
+                        // img = new File("assets/tempDump/"+index+"/img.png");
+
+                        // resManager.process(this);
+
+                        // try{
+
+                        //     Thread.sleep(1000000);
+                        
+                        // }
+
+                        // catch(Exception ex){
+
+                        //     System.out.println("Exception@CLientHanlder.run "+index+" :: "+ex.getMessage());
+                        // }
+
+                        // fin = new FileInputStream(img);
+
+                        // while((n = fin.read(buff)) != -1){
+
+                        //     dout.write(buff,0,n);
+                        // }      
+                        
+                        System.out.println("Done");
+
                     }
 
+                    
                     catch(Exception ex){
 
-                        System.out.println("Exception@CLientHanlder.run "+index+" :: "+ex.getMessage());
+                        System.out.println("Exception@ClientHandler.run :: "+ex.getMessage());
+                        ex.printStackTrace();
+
                     }
 
-                    fin = new FileInputStream(img);
+                    finally{
 
-                    while((n = fin.read(buff)) != -1){
+                        System.out.println("@ClientHandler.run.finally");
 
-                        dout.write(buff,0,n);
-                    }      
-                    
-                    skt.close();
-                    fin.close();
-                    din.close();
-                    dout.close();
+                        if(skt !=  null)skt.close();
+                        if(fin !=  null)fin.close();
+                        if(din !=  null)din.close();
+                        if(dout !=  null)dout.close();
 
-                    skt = null;
+                        skt = null;
 
-                    poolManager.free(index);
+                        poolManager.free(index);
+
+                    }
 
                 }
 
             }
 
             catch(Exception ex){
-
-                try{
-
-                    skt.close();
-                    fin.close();
-                    din.close();
-                    dout.close();
-
-                    skt = null;
-
-                }
-
-                catch(Exception e){
-
-                    System.out.println("Exception@ClientHandler :: "+e.getMessage());
-
-                    e.printStackTrace();
-                }
-
-                poolManager.free(index);
 
                 System.out.println("Exception@ClientHandler.run "+index+" :: "+ex.getMessage());
                 

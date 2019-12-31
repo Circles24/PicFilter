@@ -6,8 +6,8 @@ public class ImageProcessorPoolManager{
 
     ImageProcessor[] imgProcessorRef;
 
-    HashSet<ImageProcessor> idleImgProcessors;
-    HashSet<ImageProcessor> busyImgProcessors;
+    HashSet<Integer> idleImgProcessors;
+    HashSet<Integer> busyImgProcessors;
 
     public ImageProcessorPoolManager(ResourceManager resManager ,int IMAGE_PROCESSORS_COUNT){
 
@@ -17,8 +17,8 @@ public class ImageProcessorPoolManager{
 
         imgProcessorRef = new ImageProcessor[IMAGE_PROCESSORS_COUNT];
 
-        idleImgProcessors = new HashSet<ImageProcessor>();
-        busyImgProcessors = new HashSet<ImageProcessor>();
+        idleImgProcessors = new HashSet<Integer>();
+        busyImgProcessors = new HashSet<Integer>();
         
         for(int i=0;i<IMAGE_PROCESSORS_COUNT;i++){
 
@@ -26,7 +26,7 @@ public class ImageProcessorPoolManager{
 
             imgProcessorRef[i] = new ImageProcessor(this,i);
             
-            idleImgProcessors.add(imgProcessorRef[i]);
+            idleImgProcessors.add(i);
         
         }
     }
@@ -35,11 +35,9 @@ public class ImageProcessorPoolManager{
 
         System.out.println("@ImageProcessorPoolManager.free");
 
-        ImageProcessor imgProcessor = imgProcessorRef[index];
+        if(busyImgProcessors.remove(index)){
 
-        if(busyImgProcessors.remove(imgProcessor)){
-
-            idleImgProcessors.add(imgProcessor);
+            idleImgProcessors.add(index);
         }
 
         resManager.interrupt();
@@ -56,11 +54,11 @@ public class ImageProcessorPoolManager{
 
         if(idleImgProcessors.size() == 0)throw new Exception("Image Processors are'nt available");
 
-        ImageProcessor imgProcessor = idleImgProcessors.iterator().next();
+        int imgProcessorIndex = idleImgProcessors.iterator().next();
 
-        idleImgProcessors.remove(imgProcessor);
-        busyImgProcessors.add(imgProcessor);
+        idleImgProcessors.remove(imgProcessorIndex);
+        busyImgProcessors.add(imgProcessorIndex);
 
-        return imgProcessor;
+        return imgProcessorRef[imgProcessorIndex];
     }
 }
