@@ -102,17 +102,23 @@ class ResourceManager
         ClientHandler chHandler;
         ImageProcessor imgProcessor;
 
+        int iterationID = 0;
+
         while(true){
+
+            System.out.println("@ResourceManager.run iteration "+(iterationID++));
 
             try{
 
                 if(processQueue.size() == 0 || IPPoolManager.isImageProcessorAvailable() == false){
 
-                    Thread.sleep(1000);
+                    Thread.sleep(100000);
 
                 }
 
                 else{
+
+                    System.out.println("Managing Queue");
 
                     while(processQueue.size() > 0 && IPPoolManager.isImageProcessorAvailable() == true ){
 

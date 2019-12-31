@@ -26,7 +26,6 @@ public class Client{
     FileInputStream fin;
     FileOutputStream fout;
 
-
     ClientThreadder  threadder;
 
     class ClientThreadder extends Thread
@@ -99,7 +98,7 @@ public class Client{
 
                     System.out.println("Server not available closing the shell");
 
-                    return ;
+                    break;
                 }
                 
                 System.out.println("enter the file address");
@@ -114,34 +113,35 @@ public class Client{
 
                 dout.writeInt(imgFileSize);
 
-                // while( (n = fin.read(buff)) > 0){
+                while( (n = fin.read(buff)) > 0){
 
-                //     dout.write(buff,0,n);
+                    dout.write(buff,0,n);
 
-                // }
+                }
                 
                 fin.close();
 
-                // System.out.println("Enter the result img name");
+                System.out.println("Transfer of your image sucessful");
+                System.out.println("Enter the result img address");
 
-                // imgFileName = scn.next();
-                // img = new File(imgFileName);
+                imgFileName = scn.next();
+                img = new File(imgFileName);
 
-                // fout = new FileOutputStream(img);
+                fout = new FileOutputStream(img);
 
-                // System.out.println("Server is processing your request");
+                System.out.println("Server is processing your request");
 
-                // while(imgFileSize > 0){
+                while(imgFileSize > 0){
 
-                //     n = din.read(buff);
+                    n = din.read(buff);
 
-                //     imgFileSize -= n;
+                    imgFileSize -= n;
 
-                //     fout.write(buff,0,n);
+                    fout.write(buff,0,n);
 
-                // }
+                }
 
-                // System.out.println("your img has been saved as "+imgFileName);
+                System.out.println("your img has been saved as "+imgFileName);
                 System.out.println("Done");
             }
 
@@ -153,25 +153,24 @@ public class Client{
 
             }
 
-
         }
 
         try{
 
-            scn.close();
-            din.close();
-            dout.close();
-            skt.close();
-
+            if(scn != null)scn.close();
+            if(din != null)din.close();
+            if(dout != null)dout.close();
+            if(skt != null)skt.close();
+        
         }
-
-        catch(Exception ex){
+    
+        catch(Exception ex)
+        {
 
             System.out.println("Exception@Client.run :: "+ex.getMessage());
-
             ex.printStackTrace();
-        }
 
+        }
     }
 
     public static void main(String args[]){

@@ -75,6 +75,8 @@ class ClientHandler
 
         int k = 0;
 
+        File file;
+
         while(true){
 
             try{
@@ -98,41 +100,55 @@ class ClientHandler
 
                         System.out.println("File Size :: "+imgSize);
 
-                        // fout = new FileOutputStream("assets/tempDump/"+index+"/img.png");
+                        file = new File("assets/tempDump/"+index);
 
-                        // while(imgSize != 0){
+                        if(file.exists() == false){
 
-                        //     n = din.read(buff);
+                            file.mkdirs();
+                        }
 
-                        //     imgSize -= n;
+                        file = new File("assets/tempDump/"+index+"/img.jpg");
 
-                        //     fout.write(buff,0,n);
+                        if(file.exists() == false){
 
-                        // }
+                            file.createNewFile();
+                        }
 
-                        // fout.close();
+                        fout = new FileOutputStream("assets/tempDump/"+index+"/img.jpg");
 
-                        // img = new File("assets/tempDump/"+index+"/img.png");
+                        while(imgSize != 0){
 
-                        // resManager.process(this);
+                            n = din.read(buff);
 
-                        // try{
+                            imgSize -= n;
 
-                        //     Thread.sleep(1000000);
+                            fout.write(buff,0,n);
+
+                        }
+
+                        fout.close();
+
+                        img = new File("assets/tempDump/"+index+"/img.jpg");
+
+                        resManager.process(this);
+
+                        try{
+
+                            Thread.sleep(1000000);
                         
-                        // }
+                        }
 
-                        // catch(Exception ex){
+                        catch(Exception ex){
 
-                        //     System.out.println("Exception@CLientHanlder.run "+index+" :: "+ex.getMessage());
-                        // }
+                            System.out.println("Exception@ClientHanlder.run "+index+" :: "+ex.getMessage());
+                        }
 
-                        // fin = new FileInputStream(img);
+                        fin = new FileInputStream(img);
 
-                        // while((n = fin.read(buff)) != -1){
+                        while((n = fin.read(buff)) != -1){
 
-                        //     dout.write(buff,0,n);
-                        // }      
+                            dout.write(buff,0,n);
+                        }      
                         
                         System.out.println("Done");
 
