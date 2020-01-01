@@ -28,7 +28,20 @@ class ResourceManager
 
         public void run(){
 
-            resManager.run();
+            while(true){
+
+                try{
+
+                    resManager.run();
+
+                }
+                
+                catch(Exception ex){
+
+                    System.out.println("Exception@ResourceManagerThreadder.run :: "+ex.getMessage());
+                }
+            }
+
         }
 
     }
@@ -47,14 +60,20 @@ class ResourceManager
         System.out.println("\nAllocating image processors");
 
         IPPoolManager = new ImageProcessorPoolManager(this,IMAGE_PROCESSOR_COUNT);
+
+        threadder = new ResourceManagerThreadder(this);
     }
 
     public static synchronized ResourceManager getInstance(int CLIENT_HANDLER_COUNT,int IMAGE_PROCESSOR_COUNT)
     {
         System.out.println("@ResourceManager.getInstance(int,int)");
 
-        if(selfRef == null)
+        if(selfRef == null){
+
             selfRef = new  ResourceManager(CLIENT_HANDLER_COUNT,IMAGE_PROCESSOR_COUNT);
+
+        }
+            
 
         return selfRef;
     }
@@ -80,7 +99,11 @@ class ResourceManager
 
         processQueue.add(CHandler);
 
-        this.interrupt();
+        System.out.println("now interrupting the resManagerThreadder");
+
+        threadder.interrupt();
+
+        System.out.println("resmanager interrupted");
     }
 
     public synchronized ClientHandler getClientHandler()throws Exception
@@ -112,7 +135,7 @@ class ResourceManager
 
                 if(processQueue.size() == 0 || IPPoolManager.isImageProcessorAvailable() == false){
 
-                    Thread.sleep(100000);
+                    Thread.sleep(Long.MAX_VALUE);
 
                 }
 

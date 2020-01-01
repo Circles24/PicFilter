@@ -14,7 +14,9 @@ class ClientHandler
     DataInputStream din;
     DataOutputStream dout;
 
+    int editChoice;
     File img;
+
     byte[] buff;
 
     FileOutputStream fout;
@@ -47,6 +49,8 @@ class ClientHandler
         this.poolManager = poolManager;
         this.resManager = resManager;
         this.index = index;
+
+        buff = new byte[1024];
 
         this.threadder = new ClientHandlerThreadder(this);
         
@@ -87,7 +91,7 @@ class ClientHandler
 
                     System.out.println("Client Handler "+index+" going to sleep");
 
-                    Thread.sleep(100000);
+                    Thread.sleep(Long.MAX_VALUE);
                 }
 
                 else{
@@ -96,9 +100,10 @@ class ClientHandler
   
                         System.out.println("Client Handler "+index+" waiting for client");
 
+                        editChoice = din.readInt();
                         imgSize = din.readInt();
 
-                        System.out.println("File Size :: "+imgSize);
+                        System.out.println("File Size :: "+imgSize+" Edit Choice :: "+editChoice);
 
                         file = new File("assets/tempDump/"+index);
 
@@ -116,6 +121,8 @@ class ClientHandler
 
                         fout = new FileOutputStream("assets/tempDump/"+index+"/img.jpg");
 
+                        System.out.println("Started reading file");
+
                         while(imgSize != 0){
 
                             n = din.read(buff);
@@ -126,6 +133,8 @@ class ClientHandler
 
                         }
 
+                        System.out.println("read the file");
+
                         fout.close();
 
                         img = new File("assets/tempDump/"+index+"/img.jpg");
@@ -134,21 +143,30 @@ class ClientHandler
 
                         try{
 
-                            Thread.sleep(1000000);
+                            System.out.println("now client handler is sleeping for img processor run");
+
+                            Thread.sleep(Long.MAX_VALUE);
                         
                         }
 
                         catch(Exception ex){
 
                             System.out.println("Exception@ClientHanlder.run "+index+" :: "+ex.getMessage());
+                            ex.printStackTrace();
                         }
 
                         fin = new FileInputStream(img);
 
+                        System.out.println("Sending back the processed image :: "+fin.available());
+
+                        dout.writeInt(fin.available());
+
                         while((n = fin.read(buff)) != -1){
 
                             dout.write(buff,0,n);
-                        }      
+                        }
+                        
+                        fin.close();
                         
                         System.out.println("Done");
 
@@ -157,7 +175,7 @@ class ClientHandler
                     
                     catch(Exception ex){
 
-                        System.out.println("Exception@ClientHandler.run :: "+ex.getMessage());
+                        System.out.println("Exception@ClientHandler.run "+index+" :: "+ex.getMessage());
                         ex.printStackTrace();
 
                     }
@@ -195,6 +213,16 @@ class ClientHandler
     public void interrupt(){
 
         threadder.interrupt();
+    }
+
+    public String getTempDumpAddress(){
+
+        return "assets/tempDump/"+index+"/img.jpg";
+    }
+
+    public int getEditChoice(){
+
+        return editChoice;
     }
     
 }

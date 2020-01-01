@@ -28,6 +28,9 @@ public class Client{
 
     ClientThreadder  threadder;
 
+    Scanner scn;
+    int editChoice;
+
     class ClientThreadder extends Thread
     {
 
@@ -54,7 +57,11 @@ public class Client{
         
         buff = new byte[BUFF_SIZE];
 
+        scn = new Scanner(System.in);
+        editChoice = -1;
+
         threadder = new ClientThreadder(this); 
+
     }
 
     public void init()throws Exception
@@ -67,6 +74,37 @@ public class Client{
 
     }
 
+    protected void main_menu(){
+
+        System.out.println("***************** MENU ***************\n");
+        System.out.println("  Black & White          ::       0");
+        System.out.println("  _GB                    ::       1");
+        System.out.println("  R_B                    ::       2");
+        System.out.println("  RG_                    ::       3");
+        System.out.println("  R__                    ::       4");
+        System.out.println("  _G_                    ::       5");
+        System.out.println("  __B                    ::       6");
+        System.out.println("  Hrand                  ::       7");
+        System.out.println("  Srand                  ::       8");
+        System.out.println("  Xrand                  ::       9");
+        System.out.println("  Sdull                  ::       10");
+        System.out.println("  Hdull                  ::       11");
+        System.out.println("  EXrand                 ::       12");
+
+        editChoice = scn.nextInt();
+    }
+
+    protected void menu(){
+
+        while(true){
+
+            main_menu();
+
+            if(editChoice >= 0 && editChoice <= 12)break;
+        }
+
+    }
+
     public void run(){
 
         System.out.println("@Client.run");
@@ -75,17 +113,27 @@ public class Client{
         int imgFileSize;
 
         int n;
-        
-        Scanner scn = new Scanner(System.in);
 
         while(true){
 
             try{
 
-                System.out.println("Enter 0/1 for exit/continue");
+                System.out.println("press 0 to exit");
 
                 if(scn.nextInt() == 0)break;
-            
+
+                menu();
+                
+                System.out.println("enter the file address");
+
+                imgFileName = scn.next();
+
+                img = new File(imgFileName);
+                fin = new FileInputStream(img);
+                imgFileSize = fin.available();
+
+                System.out.println(imgFileName+" :: "+imgFileSize);
+
                 try{
 
                     init();
@@ -100,17 +148,8 @@ public class Client{
 
                     break;
                 }
-                
-                System.out.println("enter the file address");
 
-                imgFileName = scn.next();
-
-                img = new File(imgFileName);
-                fin = new FileInputStream(img);
-                imgFileSize = fin.available();
-
-                System.out.println(imgFileName+" :: "+imgFileSize);
-
+                dout.writeInt(editChoice);
                 dout.writeInt(imgFileSize);
 
                 while( (n = fin.read(buff)) > 0){
@@ -122,14 +161,17 @@ public class Client{
                 fin.close();
 
                 System.out.println("Transfer of your image sucessful");
-                System.out.println("Enter the result img address");
 
-                imgFileName = scn.next();
+                imgFileName = "assets/response/res.jpg";
+
                 img = new File(imgFileName);
-
                 fout = new FileOutputStream(img);
 
                 System.out.println("Server is processing your request");
+
+                imgFileSize = din.readInt();
+
+                System.out.println("Reading the processed file :: "+imgFileSize);
 
                 while(imgFileSize > 0){
 
@@ -177,19 +219,23 @@ public class Client{
 
         try{
 
-            if(args.length != 3)throw new Exception("Usage :: java Client <ServerIP> <ServerPortNo> <BUFF_SIZE> ");
+            Scanner  scn = new Scanner(new File("datDump/Client.dat"));
 
-            InetAddress serverIp = InetAddress.getByName(args[0]);
+            InetAddress serverIp = InetAddress.getByName(scn.next());
+            int serverPortNo = scn.nextInt();
+            int BUFF_SIZE = scn.nextInt();
 
-            int serverPortNo = Integer.parseInt(args[1]);
+            scn.close();
 
-            int BUFF_SIZE = Integer.parseInt(args[2]);
+            System.out.println("Client "+serverIp+" "+serverPortNo+" "+BUFF_SIZE);
 
             new Client(serverIp,serverPortNo,BUFF_SIZE);
 
         }
 
         catch(Exception ex){
+
+            System.out.println("corrupted reource files");
 
             System.out.println("Exception@Client.main :: "+ex.getMessage());
 

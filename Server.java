@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
 public class Server implements Runnable
 {
@@ -81,17 +82,22 @@ public class Server implements Runnable
 
         try{
 
-            if(args.length != 3)throw new Exception("Usage :: java Server <portNo> <client_handler_count> <image_processor_count> ");
+            Scanner scn  = new Scanner(new File("datDump/Server.dat"));
 
-            int portNo = Integer.parseInt(args[0]);
-            int CLIENT_HANDLER_COUNT = Integer.parseInt(args[1]);
-            int IMAGE_PROCESSOR_COUNT = Integer.parseInt(args[2]);
+            int portNo = scn.nextInt();
+            int CLIENT_HANDLER_COUNT = scn.nextInt();
+            int IMAGE_PROCESSOR_COUNT = scn.nextInt();
+
+            System.out.println("Server "+portNo+" "+CLIENT_HANDLER_COUNT+" "+IMAGE_PROCESSOR_COUNT);
 
             new Server(portNo,CLIENT_HANDLER_COUNT,IMAGE_PROCESSOR_COUNT);
 
+            scn.close();
         }
 
         catch(Exception ex){
+
+            System.out.println("Data resources are corrupted");
 
             System.out.println("Exception@Server.main :: "+ex.getMessage());
 
