@@ -1,5 +1,10 @@
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.DataOutputStream;
+
+import java.net.Socket;
+import java.net.ServerSocket;
+import java.net.InetSocketAddress;
+
 import java.util.Scanner;
 
 public class Server implements Runnable
@@ -7,7 +12,7 @@ public class Server implements Runnable
 
     private ResourceManager resManager;
 
-    private ServerSocket sskt;
+    private ServerSocket sSkt;
 
     public Server(int portNo,int CLIENT_HANDLER_COUNT,int IMAGE_PROCESSOR_COUNT) throws Exception
     {
@@ -24,7 +29,7 @@ public class Server implements Runnable
 
         System.out.println("\nStatic resources allocated");
 
-        sskt = new ServerSocket(portNo);
+        sSkt = new ServerSocket(portNo);
 
         new Thread(this).start();
     }
@@ -41,7 +46,7 @@ public class Server implements Runnable
 
             while(true){
 
-                skt = sskt.accept();
+                skt = sSkt.accept();
 
                 System.out.println("New Connection Req :: " + (InetSocketAddress)skt.getRemoteSocketAddress());
 

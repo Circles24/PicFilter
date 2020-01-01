@@ -2,18 +2,15 @@ import java.util.HashSet;
 
 public class ImageProcessorPoolManager{
 
-    ResourceManager resManager;
-
     ImageProcessor[] imgProcessorRef;
 
     HashSet<Integer> idleImgProcessors;
     HashSet<Integer> busyImgProcessors;
 
-    public ImageProcessorPoolManager(ResourceManager resManager ,int IMAGE_PROCESSORS_COUNT){
+    public ImageProcessorPoolManager(int IMAGE_PROCESSORS_COUNT)throws Exception
+    {
 
         System.out.println("@ImageProcessorPoolManager.ImageProcessorPoolManager");
-
-        this.resManager = resManager;
 
         imgProcessorRef = new ImageProcessor[IMAGE_PROCESSORS_COUNT];
 
@@ -39,8 +36,6 @@ public class ImageProcessorPoolManager{
 
             idleImgProcessors.add(index);
         }
-
-        resManager.interrupt();
     }
 
     public boolean isImageProcessorAvailable(){

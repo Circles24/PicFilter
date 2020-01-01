@@ -90,6 +90,9 @@ public class Client{
         System.out.println("  Sdull                  ::       10");
         System.out.println("  Hdull                  ::       11");
         System.out.println("  EXrand                 ::       12");
+        System.out.println("  inv                    ::       13");
+        System.out.println("  R1                     ::       14");
+        System.out.println("  R2                     ::       15");
 
         editChoice = scn.nextInt();
     }
@@ -100,7 +103,7 @@ public class Client{
 
             main_menu();
 
-            if(editChoice >= 0 && editChoice <= 12)break;
+            if(editChoice >= 0 && editChoice <= 15)break;
         }
 
     }

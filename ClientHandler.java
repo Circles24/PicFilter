@@ -1,5 +1,7 @@
+import java.util.Scanner;
 import java.io.*;
 import java.net.*;
+
 
 class ClientHandler
 {
@@ -42,15 +44,20 @@ class ClientHandler
 
     }
 
-    public ClientHandler(ClientHandlerPoolManager poolManager,ResourceManager resManager,int index){
+    public ClientHandler(ClientHandlerPoolManager poolManager,int index)throws Exception
+    {
 
         System.out.println("@ ClientHandler.ClientHandler :: "+index);
 
         this.poolManager = poolManager;
-        this.resManager = resManager;
+        this.resManager = ResourceManager.getInstance();
         this.index = index;
 
-        buff = new byte[1024];
+        Scanner scn = new Scanner(new File("datDump/ClientHandler.dat"));
+
+        buff = new byte[scn.nextInt()];
+
+        scn.close();
 
         this.threadder = new ClientHandlerThreadder(this);
         

@@ -9,7 +9,6 @@ class ResourceManager
     Queue<ClientHandler> processQueue;
 
     ClientHandlerPoolManager CHPoolManager;
-
     ImageProcessorPoolManager IPPoolManager;
 
     ResourceManagerThreadder threadder;
@@ -46,35 +45,36 @@ class ResourceManager
 
     }
 
-    private ResourceManager(int CLIENT_HANDLER_COUNT,int IMAGE_PROCESSOR_COUNT)
+    private ResourceManager(int CLIENT_HANDLER_COUNT,int IMAGE_PROCESSOR_COUNT)throws Exception
     {
 
         System.out.println("@ResourceManager.ResourceManager");
+
+        selfRef = this;
 
         processQueue = new LinkedList<ClientHandler>();
 
         System.out.println("\nAllocating Client Handlers");
 
-        CHPoolManager = new ClientHandlerPoolManager(this,CLIENT_HANDLER_COUNT);
+        CHPoolManager = new ClientHandlerPoolManager(CLIENT_HANDLER_COUNT);
 
         System.out.println("\nAllocating image processors");
 
-        IPPoolManager = new ImageProcessorPoolManager(this,IMAGE_PROCESSOR_COUNT);
+        IPPoolManager = new ImageProcessorPoolManager(IMAGE_PROCESSOR_COUNT);
 
         threadder = new ResourceManagerThreadder(this);
     }
 
-    public static synchronized ResourceManager getInstance(int CLIENT_HANDLER_COUNT,int IMAGE_PROCESSOR_COUNT)
+    public static synchronized ResourceManager getInstance(int CLIENT_HANDLER_COUNT,int IMAGE_PROCESSOR_COUNT)throws Exception
     {
         System.out.println("@ResourceManager.getInstance(int,int)");
 
         if(selfRef == null){
 
-            selfRef = new  ResourceManager(CLIENT_HANDLER_COUNT,IMAGE_PROCESSOR_COUNT);
+            new  ResourceManager(CLIENT_HANDLER_COUNT,IMAGE_PROCESSOR_COUNT);
 
         }
             
-
         return selfRef;
     }
 

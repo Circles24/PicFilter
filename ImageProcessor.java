@@ -1,11 +1,13 @@
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
+
 import java.io.File;
 import java.util.Random;
 
 class ImageProcessor 
 {
+    ResourceManager resManager;
+
     int index;
     ImageProcessorPoolManager poolManager;
     ClientHandler ClHandler;
@@ -18,7 +20,7 @@ class ImageProcessor
     int imgHeight;
     int editChoice;
 
-    int A,R,G,B,data;
+    int A,R,G,B,data,temp;
     Random rand;
 
     class ImageProcessorThreadder extends Thread
@@ -38,11 +40,14 @@ class ImageProcessor
         }
     }
 
-    public ImageProcessor(ImageProcessorPoolManager poolManager,int index){
+    public ImageProcessor(ImageProcessorPoolManager poolManager,int index)throws Exception
+    {
 
         System.out.println("@ImageProcessor.ImageProcessor :: "+index);
 
         ClHandler = null;
+
+        resManager = ResourceManager.getInstance();
 
         this.poolManager = poolManager;
         this.index = index;
@@ -179,6 +184,35 @@ class ImageProcessor
 
                 }break;
 
+                case 13:
+                {
+
+                    R = ~R;
+                    G = ~G;
+                    B = ~B;
+
+                }break;
+
+                case 14:
+                {
+
+                    temp = R;
+                    R = G;
+                    G = B;
+                    B = temp;
+
+                }break;
+
+                case 15:
+                {
+
+                    temp = B;
+                    B = G;
+                    G = R;
+                    R = temp;
+
+                }break;
+
         }
 
         // System.out.println("    $data :: "+A+" "+R+" "+G+" "+B);
@@ -271,6 +305,7 @@ class ImageProcessor
                         ClHandler.interrupt();
                         ClHandler = null;
                         poolManager.free(index);
+                        resManager.interrupt();
 
                     }
                 }

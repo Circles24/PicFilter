@@ -2,18 +2,15 @@ import java.util.HashSet;
 
 public class ClientHandlerPoolManager{
 
-    ResourceManager resManager;
-
     ClientHandler[] ClientHandlerRef;
 
     HashSet<Integer> idleClientHandlers;
     HashSet<Integer> busyClientHandlers;
 
-    public ClientHandlerPoolManager(ResourceManager resManager,int CLIENT_HANDLER_COUNT){
+    public ClientHandlerPoolManager(int CLIENT_HANDLER_COUNT)throws Exception
+    {
 
         System.out.println("@ClientHandlerPoolManager.ClientHandlerPoolManager");
-
-        this.resManager = resManager;
 
         ClientHandlerRef = new ClientHandler[CLIENT_HANDLER_COUNT];
 
@@ -24,7 +21,7 @@ public class ClientHandlerPoolManager{
 
             System.out.println("@ intializing client handlers "+i+" of "+CLIENT_HANDLER_COUNT);
 
-            ClientHandlerRef[i] = new ClientHandler(this,resManager,i);
+            ClientHandlerRef[i] = new ClientHandler(this,i);
 
             idleClientHandlers.add(i);
         }
