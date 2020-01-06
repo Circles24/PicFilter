@@ -7,34 +7,36 @@ import java.net.InetSocketAddress;
 
 import java.util.Scanner;
 
-public class Server implements Runnable
+public class Server
 {
 
     private ResourceManager resManager;
 
     private ServerSocket sSkt;
 
-    public Server(int portNo,int CLIENT_HANDLER_COUNT,int IMAGE_PROCESSOR_COUNT) throws Exception
+    public Server(final int portNo,final int CLIENT_HANDLER_COUNT,final int IMAGE_PROCESSOR_COUNT) throws Exception
     {
-
-        if(CLIENT_HANDLER_COUNT < 1)throw new Exception("invalid client handler count");
-
-        if(IMAGE_PROCESSOR_COUNT < 1)throw new Exception("invalid image processor count");
 
         System.out.println("@Server.Server");
 
-        resManager = ResourceManager.getInstance(CLIENT_HANDLER_COUNT,IMAGE_PROCESSOR_COUNT);
+        sSkt = new ServerSocket(portNo);
 
-        Thread.sleep(200);
+        resManager = ResourceManager.getInstance(CLIENT_HANDLER_COUNT,IMAGE_PROCESSOR_COUNT);
 
         System.out.println("\nStatic resources allocated");
 
-        sSkt = new ServerSocket(portNo);
+        new Thread(){
 
-        new Thread(this).start();
+            public void run(){
+
+                processRequests();
+
+            }
+
+        }.start();
     }
 
-    public void run()
+    public void processRequests()
     {   
 
         System.out.println("@Server.run");
@@ -85,19 +87,22 @@ public class Server implements Runnable
     {
         System.out.println("@Server.main");
 
+        Scanner scn = null;
+
         try{
 
-            Scanner scn  = new Scanner(new File("datDump/Server.dat"));
+            scn  = new Scanner(new File("datDump/Server.dat"));
 
             int portNo = scn.nextInt();
             int CLIENT_HANDLER_COUNT = scn.nextInt();
             int IMAGE_PROCESSOR_COUNT = scn.nextInt();
 
+            if(CLIENT_HANDLER_COUNT < 0 || IMAGE_PROCESSOR_COUNT < 0)throw new Exception("wrong arguments");
+
             System.out.println("Server "+portNo+" "+CLIENT_HANDLER_COUNT+" "+IMAGE_PROCESSOR_COUNT);
 
             new Server(portNo,CLIENT_HANDLER_COUNT,IMAGE_PROCESSOR_COUNT);
 
-            scn.close();
         }
 
         catch(Exception ex){
@@ -108,6 +113,11 @@ public class Server implements Runnable
 
             ex.printStackTrace();
 
+        }
+
+        finally{
+
+            scn.close();
         }
     }
 

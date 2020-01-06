@@ -1,4 +1,6 @@
+import java.io.File;
 import java.util.Queue;
+import java.util.Scanner;
 import java.util.LinkedList;
 
 class ResourceManager
@@ -8,8 +10,8 @@ class ResourceManager
 
     Queue<ClientHandler> processQueue;
 
-    ClientHandlerPoolManager CHPoolManager;
-    ImageProcessorPoolManager IPPoolManager;
+    PoolManager CHPoolManager;
+    PoolManager IPPoolManager;
 
     ResourceManagerThreadder threadder;
 
@@ -29,16 +31,7 @@ class ResourceManager
 
             while(true){
 
-                try{
-
-                    resManager.run();
-
-                }
-                
-                catch(Exception ex){
-
-                    System.out.println("Exception@ResourceManagerThreadder.run :: "+ex.getMessage());
-                }
+                resManager.run();
             }
 
         }
@@ -56,11 +49,11 @@ class ResourceManager
 
         System.out.println("\nAllocating Client Handlers");
 
-        CHPoolManager = new ClientHandlerPoolManager(CLIENT_HANDLER_COUNT);
+        CHPoolManager = new PoolManager(CLIENT_HANDLER_COUNT,ClientHandler.getGenerator());
 
         System.out.println("\nAllocating image processors");
 
-        IPPoolManager = new ImageProcessorPoolManager(IMAGE_PROCESSOR_COUNT);
+        IPPoolManager = new PoolManager(IMAGE_PROCESSOR_COUNT,ImageProcessor.getGenerator());
 
         threadder = new ResourceManagerThreadder(this);
     }
@@ -78,18 +71,27 @@ class ResourceManager
         return selfRef;
     }
 
-    public static synchronized ResourceManager getInstance() throws Exception
+    public static synchronized ResourceManager getInstance()throws Exception
     {
         System.out.println("@ResourceManager.getInstance()");
 
-        if(selfRef == null)throw new Exception("Resource Manager not initialized yet");
+        if(selfRef == null)
+        {
+
+            Scanner scn = new Scanner(new File("datDump/ResourceManager.dat"));
+
+            getInstance(scn.nextInt(),scn.nextInt());
+
+            scn.close();
+
+        }
 
         return selfRef;
     }
 
     public boolean isClientHandlerAvailable()
     {
-        return CHPoolManager.isClientHandlerAvailable();
+        return CHPoolManager.isResourceAvailable();
     }
 
     public synchronized void process(ClientHandler CHandler)
@@ -108,9 +110,9 @@ class ResourceManager
 
     public synchronized ClientHandler getClientHandler()throws Exception
     {
-        if(CHPoolManager.isClientHandlerAvailable() == false)throw new Exception("All Client Handlers are busy");
+        if(CHPoolManager.isResourceAvailable() == false)throw new Exception("All Client Handlers are busy");
         
-        return CHPoolManager.getClientHandler();
+        return (ClientHandler)CHPoolManager.getPoolResource();
     }
 
     public void interrupt(){
@@ -133,7 +135,7 @@ class ResourceManager
 
             try{
 
-                if(processQueue.size() == 0 || IPPoolManager.isImageProcessorAvailable() == false){
+                if(processQueue.size() == 0 || IPPoolManager.isResourceAvailable() == false){
 
                     Thread.sleep(Long.MAX_VALUE);
 
@@ -143,10 +145,10 @@ class ResourceManager
 
                     System.out.println("Managing Queue");
 
-                    while(processQueue.size() > 0 && IPPoolManager.isImageProcessorAvailable() == true ){
+                    while(processQueue.size() > 0 && IPPoolManager.isResourceAvailable() == true ){
 
                         chHandler = processQueue.remove();
-                        imgProcessor = IPPoolManager.getImageProcessor();
+                        imgProcessor = (ImageProcessor)IPPoolManager.getPoolResource();
 
                         imgProcessor.init(chHandler);
 

@@ -4,12 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Random;
 
-class ImageProcessor 
+class ImageProcessor extends PoolResource
 {
     ResourceManager resManager;
 
     int index;
-    ImageProcessorPoolManager poolManager;
+    PoolManager poolManager;
     ClientHandler ClHandler;
 
     ImageProcessorThreadder threadder;
@@ -40,7 +40,7 @@ class ImageProcessor
         }
     }
 
-    public ImageProcessor(ImageProcessorPoolManager poolManager,int index)throws Exception
+    public ImageProcessor(PoolManager poolManager,int index)throws Exception
     {
 
         System.out.println("@ImageProcessor.ImageProcessor :: "+index);
@@ -55,6 +55,27 @@ class ImageProcessor
         rand = new Random(System.currentTimeMillis());
 
         threadder = new ImageProcessorThreadder(this);
+
+    }
+
+    private ImageProcessor()
+    {
+
+        // just empty resource generator method
+
+    }
+
+    public ImageProcessor getObject(PoolManager poolManagar,int index)throws Exception
+    {
+
+        return (new ImageProcessor(poolManager, index));
+
+    }
+
+    public static ImageProcessor getGenerator()
+    {
+
+        return new ImageProcessor();
 
     }
 

@@ -3,11 +3,11 @@ import java.io.*;
 import java.net.*;
 
 
-class ClientHandler
+class ClientHandler extends PoolResource
 {
 
     int index;
-    ClientHandlerPoolManager poolManager;
+    PoolManager poolManager;
     ResourceManager resManager;
 
     ClientHandlerThreadder threadder;
@@ -44,7 +44,7 @@ class ClientHandler
 
     }
 
-    public ClientHandler(ClientHandlerPoolManager poolManager,int index)throws Exception
+    public ClientHandler(PoolManager poolManager,int index)throws Exception
     {
 
         System.out.println("@ ClientHandler.ClientHandler :: "+index);
@@ -61,6 +61,23 @@ class ClientHandler
 
         this.threadder = new ClientHandlerThreadder(this);
         
+    }
+
+    private ClientHandler()
+    {
+        // just empty resource generator method
+    }
+
+    public ClientHandler getObject(PoolManager poolManager,int index)throws Exception
+    {
+        return new ClientHandler(poolManager,index);
+
+    }
+
+    public static ClientHandler getGenerator()
+    {
+
+        return new ClientHandler();
     }
 
     public void init(Socket skt)throws Exception
